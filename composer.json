@@ -1,0 +1,6 @@
+{
+    "require": {
+        "mpdf/mpdf": "^8.2",
+        "twilio/sdk": "^8.0"
+    }
+}
