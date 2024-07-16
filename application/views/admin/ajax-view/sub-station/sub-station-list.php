@@ -42,12 +42,11 @@ if(isset($recordDetails) && !empty($recordDetails)) {
         
     }
     
-    
     if(!empty($pagination)){
         ?>
-        	<input name="current_page" type="hidden" id="current_page" value="1">
-            <input name="last_page" type="hidden" id="last_page" value="3">
-            <input name="per_page" type="hidden" id="per_page" value="20">
+        	<input name="current_page" type="hidden" id="current_page" value="<?php echo $pagination['current_page'] ?>">
+            <input name="last_page" type="hidden" id="last_page" value="<?php echo $pagination['last_page'] ?>">
+            <input name="per_page" type="hidden" id="per_page" value="<?php echo $pagination['per_page_record'] ?>">
         <?php 
     }
     

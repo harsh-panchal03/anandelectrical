@@ -1,9 +1,6 @@
 <?php
 
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use Mpdf\Mpdf;
 class Sub_station extends MY_controller{
     
     public function __construct(){
@@ -18,14 +15,6 @@ class Sub_station extends MY_controller{
     
     public function index(){
         
-        /* $mpdf = new Mpdf();
-        
-        $html = $this->load->view( "unnatiPdf", [] , true );
-        
-        $mpdf->WriteHTML($html);
-        $mpdf->Output();
-        die; */
-        
         $headerData = $data = [];
         $paginationData = $whereData = [];
         
@@ -38,8 +27,6 @@ class Sub_station extends MY_controller{
             $paginationData['per_page_record'] = $this->perPageRecord;
             $lastPage = ceil($totalRecord/$this->perPageRecord);
             $paginationData['last_page'] = $lastPage;
-            
-            
         }
         
         $whereData['limit'] = $this->perPageRecord;
@@ -56,6 +43,7 @@ class Sub_station extends MY_controller{
         
         $data['engineerDetails'] = getEngineerDetails();
         $data['subStationDetails'] = getSubStationDetails();
+        $data['cityDetails'] = $this->crud_model->selectData(CITY_TABLE , ["i_id" , "v_city_name"] , [ "order_by" => "v_city_name" ,  "t_is_deleted" => INACTIVE_STATUS]);
         
         $this->loadAdminView($headerData , $this->folderName . "sub-station" , $data);
         
@@ -63,21 +51,33 @@ class Sub_station extends MY_controller{
     
     public function filter(){
         
-        
         $headerData = $data = [];
         $paginationData = $whereData = [];
         
         $page = (!empty($this->input->post("page")) ? $this->input->post("page") : DEFAULT_PAGE_INDEX );
+        $searchEngineer = getPostData('search_engineer');
         
+        if(!empty($searchEngineer)){
+            $whereData['sb.v_engineer_type'] = $searchEngineer;
+        }
+        if(!empty(getPostData('search_status'))){
+            $searchStatus = getPostData('search_status') == ACTIVE_STATUS_TEXT ? ACTIVE_STATUS : INACTIVE_STATUS_TEXT;
+            $whereData['sb.t_is_active'] = $searchStatus;
+        }
+        
+        $searchCity = (!empty($this->input->post('search_city')) ? $this->anand_electrical->decode($this->input->post('search_city')) : "");
+        
+        if(!empty($searchCity)){
+            $whereData['sb.i_city_id'] = $searchCity;
+        }
+       
         if($page == DEFAULT_PAGE_INDEX){
-                
-            $totalRecord = count($this->crud_model->getRecordDetails( [ 'sb.i_id' ] ));
+            
+            $totalRecord = count($this->crud_model->getRecordDetails( [ 'sb.i_id' ]  , $whereData));
             $paginationData['current_page'] = DEFAULT_PAGE_INDEX;
             $paginationData['per_page_record'] = $this->perPageRecord;
             $lastPage = ceil($totalRecord/$this->perPageRecord);
             $paginationData['last_page'] = $lastPage;
-            
-            
         }
         
         if($page == DEFAULT_PAGE_INDEX){
@@ -89,10 +89,8 @@ class Sub_station extends MY_controller{
             $whereData['offset'] = ( $page - 1 )* $this->perPageRecord;
         }
         
-        
-        
         $recordDetails  = $this->crud_model->getRecordDetails([] , $whereData);
-//         dd( $this->db->last_query());
+        
         $data['recordDetails'] = $recordDetails;
         $data['pagination'] = $paginationData;
         $headerData['pageTitle'] = $this->lang->line('sub-stations');
@@ -101,11 +99,7 @@ class Sub_station extends MY_controller{
         $data['pageNo'] = $page;
         
         $html = $this->load->view( AJAX_FOLDER. "sub-station/sub-station-list", $data , true);
-         echo $html;die;
-        
-        
-        
-        
+        echo $html;die;
     }
     
     public function add(){
@@ -122,7 +116,7 @@ class Sub_station extends MY_controller{
             
             $successMessage = sprintf($this->lang->line("success-create"), $this->lang->line("sub-station"));
             $errorMessage = sprintf($this->lang->line("error-create"), $this->lang->line("sub-station"));
-//             dd($this->input->post());
+            
             $recordData = [];
            
             $recordData['v_engineer_type'] = getPostData('sub_station_engineer');
@@ -131,7 +125,6 @@ class Sub_station extends MY_controller{
             $recordData['i_locality_id'] = (!empty(getPostData('locality_id')) ? $this->anand_electrical->decode( getPostData('locality_id') ) : null );
             $recordData['v_pin_code'] = getPostData('pin_code');
             $recordData['v_sub_station_group'] = getPostData('additional_details');
-            
             
             if($recordId > 0){
                 
@@ -155,16 +148,12 @@ class Sub_station extends MY_controller{
             
             redirect(SUB_STATION_URL);
         }
-        
-        
     }
     
     
     public function showAddForm(){
+        
            $headerData = $data = [];
-           
-           $cityData = [ 1 => "ahmedabad" ];
-           $localityData = [ 1 => "ranip" ];
            
            $headerData['pageTitle'] = $this->lang->line("add-sub-station");
            $data['engineerDetails'] = getEngineerDetails();
@@ -181,7 +170,7 @@ class Sub_station extends MY_controller{
         if(!empty($recordId)){
             $recordId = (int)$this->anand_electrical->decode($recordId);
             
-            $recordInfo = $this->crud_model->getRecordDetails( [] , [ "i_id" => $recordId , "singleRecord" =>  TRUE ] );
+            $recordInfo = $this->crud_model->getRecordDetails( [] , [ "sb.i_id" => $recordId , "singleRecord" =>  TRUE ] );
            
             if(!empty($recordInfo)){
                 
@@ -189,14 +178,13 @@ class Sub_station extends MY_controller{
                 
                 $headerData = $data = [];
                 
-                $cityData = [ 1 => "ahmedabad" ];
-                $localityData = [ 1 => "ranip" ];
+                $data['localityDetails'] = $this->crud_model->selectData(LOCALITY_TABLE , ["i_id" , "v_locality_name"] , [ "order_by" => "v_locality_name" , "t_is_active" =>  ACTIVE_STATUS , "t_is_deleted" => INACTIVE_STATUS]);
+                $data['cityDetails'] = $this->crud_model->selectData(CITY_TABLE , ["i_id" , "v_city_name"] , [ "order_by" => "v_city_name" , "t_is_active" =>  ACTIVE_STATUS , "t_is_deleted" => INACTIVE_STATUS]);
                 
                 $headerData['pageTitle'] = $this->lang->line("update-sub-station");
                 $data['engineerDetails'] = getEngineerDetails();
                 $data['subStationDetails'] = getSubStationDetails();
-                $data['localityDetails'] = $localityData;
-                $data['cityDetails'] = $cityData;
+              
                 $data['recordInfo'] = $recordInfo;
                 $this->loadAdminView($headerData, $this->folderName . "add-sub-station" , $data);
                 
@@ -212,9 +200,13 @@ class Sub_station extends MY_controller{
         $errorFound = true;
         
         if(!empty($recordId)){
+            $errorFound = false;
             $this->removeRecord($this->tableName , $recordId , $this->moduleName);
         }
         
+        if($errorFound != false){
+            dd("Page NOt Found");
+        }
     }
     
     public function statusUpdate(){

@@ -43,7 +43,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-12">
+                    <div class="col-md-12">
                     <button type="submit" class="btn bg-success text-white btn-wide"><?php echo $this->lang->line("submit")?></button>
                     <a href="<?php echo CITY_URL ?>" class="btn btn-outline-secondary btn-wide"><?php echo $this->lang->line('cancel')?></a>
                 </div>
@@ -53,6 +53,7 @@
     </div>
 </div>
 <script>
+
     $("#locality-form").validate({
         errorClass: "invalid-input",
         rules: {

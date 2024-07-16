@@ -61,6 +61,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="col-lg-3 col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="city"><?php echo $this->lang->line('city')?><span class="text-danger line-height">*</span>:</label>

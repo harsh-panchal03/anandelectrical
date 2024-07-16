@@ -59,7 +59,7 @@
             city_name: {
                 required: true,
                 noSpace: true,
-//                 validateCity: true
+                validateCity: true
             },
             state: {
                 required: true

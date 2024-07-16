@@ -19,6 +19,8 @@ class City_master extends  MY_controller{
     
     public function index(){
         
+        
+        
         $headerData = $data = [];
         $paginationData = $whereData = [];
         
@@ -34,6 +36,10 @@ class City_master extends  MY_controller{
             
             
         }
+        //uhlzvhu
+        
+        $data['cityDetails'] = $this->crud_model->selectData ( $this->tableName , [ 'i_id' , 'v_city_name'] , ["t_is_deleted !=" => ACTIVE_STATUS ]);
+        
         
         $whereData['limit'] = $this->perPageRecord;
         $whereData['offset'] = 0;
@@ -54,6 +60,57 @@ class City_master extends  MY_controller{
         
     }
     
+    public function filter(){
+        if(!empty($this->input->post())){
+    
+            $headerData = $paginationData = $whereData = $data = [];
+            $page = (!empty($this->input->post('page')) ? $this->input->post('page') : DEFAULT_PAGE_INDEX);
+           
+            
+            if(!empty($this->input->post('search_city'))){
+                
+                $whereData['i_id'] = $this->anand_electrical->decode($this->input->post("search_city"));
+            }
+            
+            if(!empty($this->input->post('search_status'))){
+                $whereData['t_is_active'] = ($this->input->post('search_status') == ACTIVE_STATUS_TEXT ? ACTIVE_STATUS : INACTIVE_STATUS );
+            }
+           
+            if($page == DEFAULT_PAGE_INDEX){
+                
+                $totalRecord = count($this->crud_model->getRecordDetails( [ 'i_id' ]  , $whereData ));
+                $paginationData['current_page'] = DEFAULT_PAGE_INDEX;
+                $paginationData['per_page_record'] = $this->perPageRecord;
+                $lastPage = ceil($totalRecord/$this->perPageRecord);
+                $paginationData['last_page'] = $lastPage;
+            }
+            
+            
+            if($page == DEFAULT_PAGE_INDEX){
+                $whereData['limit'] = $this->perPageRecord;
+                $whereData['offset'] = 0;
+                $data['totalRecord'] = $totalRecord;
+            }else{
+                $whereData['limit'] = $this->perPageRecord;
+                $whereData['offset'] = ( $page - 1 )* $this->perPageRecord;
+            }
+           
+            
+            $recordDetails  = $this->crud_model->getRecordDetails([] , $whereData);
+            
+            $data['recordDetails'] = $recordDetails;
+            $data['pagination'] = $paginationData;
+            $headerData['pageTitle'] = $this->lang->line('sub-stations');
+            $data['pageTitle'] = $headerData['pageTitle'];
+            
+            $data['pageNo'] = $page;
+            
+            $html = $this->load->view( AJAX_FOLDER. "city/city-list", $data , true);
+            echo $html;die;
+        
+            
+        }
+    }
     
     public function showAddForm(){
         

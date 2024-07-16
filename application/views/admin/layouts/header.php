@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="-" />
     <meta name="theme-color" content="#1a388a">
-    <title><?php echo $this->lang->line('anad-electrical') ?></title>
+    <title><?php echo $this->lang->line('anad-electrical')." | " . (isset($pageTitle) ? $pageTitle : "") ?></title>
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,900" rel="stylesheet">
 	
@@ -40,6 +40,9 @@
     <script type="text/javascript" src="<?php echo JS_FOLDER . "common.js" ?>"></script>
     <script type="text/javascript" src="<?php echo JS_FOLDER . "datatable.min.js" ?>"></script>
 
+    <link rel="stylesheet" href="<?php echo CSS_FOLDER ?>hierarchy-select.min.css" />
+
+<script src="<?php echo JS_FOLDER?>hierarchy-select.min.js"></script>
     
     <script>
         var site_url = '<?php echo SITE_URL ?>';
@@ -121,6 +124,13 @@
                         <a href="<?php echo INQUIRY_MASTER_URL ?>" class="text-dark nav-link d-block px-3 py-2" title="<?php echo $this->lang->line("inquiry")?>">
                             <i class="fa fa-envelope fa-fw" aria-hidden="true"></i>
                             <span class="nav-text"><?php echo $this->lang->line("inquiry")?></span>
+                        </a>
+                    </li>
+                   	
+                   	 <li class="show-collapse">
+                        <a href="<?php echo VENDOR_MASTER_URL ?>" class="text-dark nav-link d-block px-3 py-2" title="<?php echo $this->lang->line("vendor")?>">
+                            <i class="fa fa-user-friends fa-fw" aria-hidden="true"></i>
+                            <span class="nav-text"><?php echo $this->lang->line("vendor")?></span>
                         </a>
                     </li>
                    

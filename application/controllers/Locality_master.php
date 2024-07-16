@@ -19,6 +19,13 @@ class Locality_master extends  MY_controller{
     
     public function index(){
         
+        
+        $newData = $this->crud_model->selectData("new_description_master");
+        $html = "";
+        foreach ($newData as $data){
+            $html .= "<a class='dropdown-item' data-value='". $data->i_parent_category_id + 1 ."' data-level='".( $data->i_parent_category_id + 1 )."' href='#'>". $data->v_description ."</a><br>";
+        }
+        
         $headerData = $data = [];
         $paginationData = $whereData = [];
         
@@ -31,8 +38,6 @@ class Locality_master extends  MY_controller{
             $paginationData['per_page_record'] = $this->perPageRecord;
             $lastPage = ceil($totalRecord/$this->perPageRecord);
             $paginationData['last_page'] = $lastPage;
-            
-            
         }
         
         $whereData['limit'] = $this->perPageRecord;
@@ -46,13 +51,62 @@ class Locality_master extends  MY_controller{
         
         $data['pageNo'] = $page;
         $data['totalRecord'] = $totalRecord;
-        
-      
-        
+        $data['cityDetails'] = $this->crud_model->selectData ( CITY_TABLE , [ 'i_id' , 'v_city_name'] , ["t_is_deleted !=" => ACTIVE_STATUS , "order_by" => "v_city_name asc" ]);
+        $data['localityDetails'] = $this->crud_model->selectData ( $this->tableName , [ 'i_id' , 'v_locality_name'] , ["t_is_deleted !=" => ACTIVE_STATUS , "order_by" => "v_locality_name  asc" ]);
+        $data['newHtml'] = $html;
         $this->loadAdminView($headerData , $this->folderName . "locality" , $data);
         
     }
     
+    public function filter(){
+        if (!empty($this->input->post())) {
+           
+            $headerData = $whereData = $data = $paginationData = [];
+            $page = (!empty($this->input->post('page')) ? $this->input->post('page') : DEFAULT_PAGE_INDEX);
+            
+            if(!empty($this->input->post('search_locality'))){
+                $whereData['l.i_id'] = $this->anand_electrical->decode($this->input->post('search_locality'));
+            }
+            
+            if(!empty($this->input->post('search_city'))){
+                $whereData['l.i_city_id'] = $this->anand_electrical->decode($this->input->post('search_city'));
+            }
+            
+            if(!empty($this->input->post('search_status'))){
+                $whereData['l.t_is_active'] = ($this->input->post('search_status') == ACTIVE_STATUS_TEXT ? ACTIVE_STATUS : INACTIVE_STATUS );
+            }
+//             dd($whereData);
+            if($page == DEFAULT_PAGE_INDEX){
+              
+                $totalRecord = count($this->crud_model->getRecordDetails( [ 'l.i_id'] , $whereData ));
+                $paginationData['current_page'] = DEFAULT_PAGE_INDEX;
+                $paginationData['per_page_record'] = $this->perPageRecord;
+                $lastPage = ceil($totalRecord/$this->perPageRecord);
+                $paginationData['last_page'] = $lastPage;
+                
+                $whereData['limit'] = $this->perPageRecord;
+                $whereData['offset'] = 0;
+                $data['totalRecord'] = $totalRecord;
+                
+            }else{
+                $whereData['limit'] = $this->perPageRecord;
+                $whereData['offset'] = ( $page - 1 )* $this->perPageRecord;
+            }
+           
+            $recordDetails  = $this->crud_model->getRecordDetails([] , $whereData);
+            
+            $data['recordDetails'] = $recordDetails;
+            $data['pagination'] = $paginationData;
+            $headerData['pageTitle'] = $this->lang->line('sub-stations');
+            $data['pageTitle'] = $headerData['pageTitle'];
+            
+            $data['pageNo'] = $page;
+            
+            $html = $this->load->view( AJAX_FOLDER. "locality/locality-list", $data , true);
+            echo $html;die;
+            
+           }
+    }
     
     public function showAddForm(){
         

@@ -12,8 +12,21 @@
             <div class="row">
                 <div class="col-lg-3 col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="city_name">City Name</label>
-                        <input type="text" name="city_name" id="city_name" class="form-control" placeholder="City Name">
+                        <label class="control-label" for="city_name"><?php echo $this->lang->line('city-name')?></label>
+                        <select class="form-control select2" id="search_city" name="search_city" onchange="filterData()">
+                           <option value=""><?php echo $this->lang->line("select")?></option>
+                            <?php 
+                            if(!empty($cityDetails)){
+                                foreach ($cityDetails as $key => $cityDetail){
+                                    $key = $this->anand_electrical->encode($cityDetail->i_id);
+                                         ?>
+                                         	<option value="<?php echo $key ?>"><?php echo $cityDetail->v_city_name ?></option>
+                                         <?php 
+                                     }
+                                 }
+                            
+                            ?>
+                        </select>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -91,7 +104,7 @@ function searchFiled(){
     
     searchData.search_status = $.trim($("[name='search_status']").val());
     searchData.search_engineer = $.trim($("[name='search_engineer']").val());
-    
+    searchData.search_city = $.trim($("[name='search_city']").val());
     return searchData;
 
     

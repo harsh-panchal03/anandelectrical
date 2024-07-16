@@ -115,5 +115,16 @@ $lang['add-description'] = "Add Description";
 $lang['all-description'] = "All Description";  
 
 $lang['edit'] = "Edit";
-
+$lang['search'] = "Search";
+$lang['reset'] = "Reset";
+$lang['vendor'] = "Vendor";
+$lang['add-vendor'] = "Add Vendor";
+$lang['vendor-name'] = "Vendor Name";
+$lang['vendor-number'] = "Vendor Mobile No";
+$lang['vendor-address'] = "Vendor Address";
+$lang['vendor-gst-number'] = "Vendor Gst Number";
+$lang['vendor-pay-out'] = "Vendor Pay Out";
+$lang['vendor-pay-in'] = "Vendor Pay In";
+$lang['vendor-person-name'] = "Vendor Person Name";
+$lang['vendor-type'] = "Vendor Type";
 ?>
